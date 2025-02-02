@@ -1,11 +1,11 @@
-package com.dbytes.uitilities
+package com.dbytes.uitils
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import java.util.*
 
 object JWTConfig {
-    private const val secret = "your-secret-key"
+    private const val secret = "your-secret-key" // Ensure this is consistent
     private const val issuer = "your-issuer"
     private const val audience = "your-audience"
     private const val validityInMs = 36_000_00 * 10 // 10 hours

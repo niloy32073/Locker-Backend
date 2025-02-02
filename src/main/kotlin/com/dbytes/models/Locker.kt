@@ -1,3 +1,6 @@
 package com.dbytes.models
 
-data class Locker(val id:Long, val buildingId:Long, val status:String, val type:String)
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Locker(val id:Long? = null, val buildingId:Long, val status:String, val type:String,val location:String)

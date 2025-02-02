@@ -1,4 +1,4 @@
-package com.dbytes.uitilities
+package com.dbytes.uitils
 
 import com.dbytes.tables.*
 import org.jetbrains.exposed.sql.Database

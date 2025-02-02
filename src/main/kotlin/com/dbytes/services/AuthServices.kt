@@ -9,7 +9,7 @@ class AuthServices(private val authRepository: AuthRepository) {
     suspend fun registerUser(user: User):User {
         val existingUser = authRepository.findUserByEmail(user.email)
         if (existingUser != null) {
-            throw IllegalArgumentException("User with ${existingUser.email} already exists.")
+            throw IllegalArgumentException("User with ${user.email} already exists.")
         }
 
         val newUser = authRepository.createUser(user)

@@ -22,6 +22,7 @@ class AuthRepositoryImpl : AuthRepository {
         user.copy(id = userId)
     }
 
+
     override suspend fun findUserByEmail(email: String): User? = transaction {
         UserTable.selectAll().where { UserTable.email eq email }.map{
             User(id = it[UserTable.id],name = it[UserTable.name], email = it[UserTable.email], phone = it[UserTable.phone],password = it[UserTable.password], roles = it[UserTable.roles],status = it[UserTable.status],firebaseToken = it[UserTable.firebaseToken])
