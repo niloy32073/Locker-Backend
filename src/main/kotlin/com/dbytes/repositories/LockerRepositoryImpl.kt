@@ -22,6 +22,12 @@ class LockerRepositoryImpl: LockerRepository {
         } get LockerTable.id
     }
 
+    override suspend fun getAllLocker(): List<Locker> = transaction {
+        LockerTable.selectAll().map {
+            Locker(id = it[LockerTable.id], buildingId = it[LockerTable.buildingId], status = it[LockerTable.status], location = it[LockerTable.location], type = it[LockerTable.type])
+        }
+    }
+
     override suspend fun findLockerById(id: Long): Locker? = transaction {
         LockerTable.selectAll().where(LockerTable.id eq id).map{
             Locker(id = it[LockerTable.id], buildingId = it[LockerTable.buildingId], status = it[LockerTable.status], location = it[LockerTable.location], type = it[LockerTable.type])

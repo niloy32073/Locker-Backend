@@ -3,6 +3,7 @@ package com.dbytes.services
 import com.dbytes.interfaces.LockerRepository
 import com.dbytes.models.Locker
 import com.dbytes.models.LockerStatusUpdateInfo
+import org.jetbrains.exposed.sql.transactions.transaction
 
 class LockerServices(private val lockerRepository: LockerRepository) {
     suspend fun createLocker(locker: Locker):Long{
@@ -27,5 +28,9 @@ class LockerServices(private val lockerRepository: LockerRepository) {
         else{
             throw IllegalArgumentException("Locker with id ${lockerStatusUpdateInfo.id} not found")
         }
+    }
+
+    suspend fun getAllLocker(): List<Locker> {
+        return lockerRepository.getAllLocker()
     }
 }

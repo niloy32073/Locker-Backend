@@ -11,7 +11,7 @@ object DatabaseConfig {
             url = "jdbc:postgresql://localhost:5432/postgres",
             driver = "org.postgresql.Driver",
             user = "postgres",
-            password = "password"
+            password = "32o73"
         )
         transaction {
             SchemaUtils.create(UserTable)

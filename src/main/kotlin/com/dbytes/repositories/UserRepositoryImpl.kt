@@ -1,10 +1,13 @@
 package com.dbytes.repositories
 
 import com.dbytes.interfaces.UserRepository
+import com.dbytes.models.Student
 import com.dbytes.models.User
 import com.dbytes.models.UserPersonalInfo
+import com.dbytes.tables.StudentTable
 import com.dbytes.tables.UserTable
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepositoryImpl:UserRepository {
@@ -29,6 +32,59 @@ class UserRepositoryImpl:UserRepository {
 
     override suspend fun getUserStatusById(id: Long): String? =  transaction {
         UserTable.select(UserTable.status).where { UserTable.id eq id }.map{it[UserTable.status]}.singleOrNull()
+    }
+
+    override suspend fun getUserFirebaseTokenById(id: Long): String? = transaction{
+        UserTable.select(UserTable.firebaseToken).where { UserTable.id eq id }.map{it[UserTable.firebaseToken]}.singleOrNull()
+    }
+
+    override suspend fun deleteUserById(id: Long) {
+        UserTable.deleteWhere { UserTable.id eq id }
+    }
+
+    override suspend fun updateUserStatusById(id: Long, status: String) {
+        UserTable.update({ UserTable.id eq id }) {
+            it[UserTable.status] = status
+        }
+    }
+
+    override suspend fun checkUserPasswordById(id: Long, oldPassword: String): Boolean {
+        val idExist = UserTable.select(UserTable.id).where { (UserTable.id eq id)  and (UserTable.password eq oldPassword)}.map {
+            it[UserTable.id]
+        }.singleOrNull()
+        return idExist != null
+    }
+
+    override suspend fun changeUserPasswordById(id: Long, newPassword: String) {
+        UserTable.update({ UserTable.id eq id }) {
+            it[UserTable.password] = newPassword
+        }
+    }
+
+    override suspend fun createStudent(id: Long, student: Student) {
+        StudentTable.insert {
+            it[userId] = id
+            it[academicID] = student.academicID
+            it[graduationYear] = student.graduationYear
+        }
+    }
+
+    override suspend fun updateUserNameById(id: Long, name: String) {
+        UserTable.update({ UserTable.id eq id }) {
+            it[UserTable.name] = name
+        }
+    }
+
+    override suspend fun updateUserPhoneById(id: Long, phone: String) {
+        UserTable.update({ UserTable.id eq id }) {
+            it[UserTable.phone] = phone
+        }
+    }
+
+    override suspend fun updateUserFirebaseTokenById(id: Long, firebaseToken: String) {
+        UserTable.update({ UserTable.id eq id }) {
+            it[UserTable.firebaseToken] = firebaseToken
+        }
     }
 
 }
