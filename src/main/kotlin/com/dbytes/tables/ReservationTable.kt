@@ -8,6 +8,6 @@ object ReservationTable : Table("reservations") {
     val startDate = long("start_date")
     val endDate = long("end_date")
     val lockerId = long("locker_id").references(LockerTable.id)
-
+    val status = varchar("status", 50)
     override val primaryKey = PrimaryKey(id)
 }

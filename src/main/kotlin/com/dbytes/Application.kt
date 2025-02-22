@@ -1,13 +1,11 @@
 package com.dbytes
 
-import com.dbytes.repositories.AuthRepositoryImpl
-import com.dbytes.repositories.LockerRepositoryImpl
-import com.dbytes.repositories.UserRepositoryImpl
+import com.dbytes.repositories.*
 import com.dbytes.routes.authRoutes
+import com.dbytes.routes.buildingRoutes
 import com.dbytes.routes.lockerRoutes
-import com.dbytes.services.AuthServices
-import com.dbytes.services.LockerServices
-import com.dbytes.services.UserServices
+import com.dbytes.routes.userRoutes
+import com.dbytes.services.*
 import com.dbytes.uitils.DatabaseConfig
 import com.dbytes.uitils.JWTConfig
 import io.ktor.serialization.kotlinx.json.*
@@ -47,5 +45,11 @@ fun Application.module() {
 
     val userRepositoryImpl = UserRepositoryImpl()
     val userServices = UserServices(userRepositoryImpl)
-    lockerRoutes(lockerServices,userServices)
+    val notificationRepositoryImpl = NotificationRepositoryImpl()
+    val notificationServices = NotificationServices(notificationRepositoryImpl)
+    lockerRoutes(lockerServices,userServices,notificationServices)
+    userRoutes(userServices)
+    val buildingRepositoryImpl = BuildingRepositoryImpl()
+    val buildingServices = BuildingServices(buildingRepositoryImpl)
+    buildingRoutes(buildingServices,userServices)
 }

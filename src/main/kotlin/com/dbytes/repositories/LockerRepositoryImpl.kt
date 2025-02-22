@@ -5,6 +5,7 @@ import com.dbytes.models.Locker
 import com.dbytes.models.LockerStatusUpdateInfo
 import com.dbytes.models.Reservation
 import com.dbytes.tables.LockerTable
+import com.dbytes.tables.ReservationTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
@@ -51,5 +52,44 @@ class LockerRepositoryImpl: LockerRepository {
             )}.single()
         }
 
+    override suspend fun reserveLocker(userId:Long,reservation: Reservation) {
+        transaction { ReservationTable.insert {
+            it[ReservationTable.userId] = userId
+            it[ReservationTable.lockerId] = reservation.lockerID
+            it[ReservationTable.status] = reservation.status
+            it[ReservationTable.endDate] = reservation.endDate
+            it[ReservationTable.startDate] = reservation.startDate
+        } }
+    }
+
+    override suspend fun releaseLocker(id: Long) {
+        transaction {
+            ReservationTable.update({ReservationTable.id eq id}){
+                it[ReservationTable.status] = "RELEASED"
+            }
+        }
+    }
+
+    override suspend fun getAllReservations(): List<Reservation> = transaction {
+        ReservationTable.selectAll().map { Reservation(id = it[ReservationTable.id],userId = it[ReservationTable.userId],status = it[ReservationTable.status], startDate = it[ReservationTable.startDate], endDate = it[ReservationTable.endDate], lockerID = it[ReservationTable.id]) }
+    }
+
+    override suspend fun findReservationsById(id: Long): Reservation? = transaction {
+        ReservationTable.selectAll().where(ReservationTable.id eq id).map {
+            Reservation(id = it[ReservationTable.id],userId = it[ReservationTable.userId],status = it[ReservationTable.status], startDate = it[ReservationTable.startDate], endDate = it[ReservationTable.endDate], lockerID = it[ReservationTable.id])
+        }.singleOrNull()
+    }
+
+    override suspend fun getAllReservationsByStatus(status: String): List<Reservation> = transaction {
+        ReservationTable.selectAll().where(ReservationTable.status eq status).map {
+            Reservation(id = it[ReservationTable.id],userId = it[ReservationTable.userId],status = it[ReservationTable.status], startDate = it[ReservationTable.startDate], endDate = it[ReservationTable.endDate], lockerID = it[ReservationTable.id])
+        }
+    }
+
+    override suspend fun updateReservationStatus(id: Long, status: String) {
+        ReservationTable.update({ReservationTable.id eq id}){
+            it[ReservationTable.status] = status
+        }
+    }
 
 }

@@ -26,6 +26,12 @@ class UserRepositoryImpl:UserRepository {
         }.singleOrNull()
     }
 
+    override suspend fun getUserIdByRole(role: String): Long? = transaction {
+        UserTable.selectAll().where { UserTable.roles eq role }.map {
+            it[UserTable.id]
+        }.singleOrNull()
+    }
+
     override suspend fun getUserRoleById(id: Long): String? = transaction {
         UserTable.select(UserTable.roles).where { UserTable.id eq id }.map{it[UserTable.roles]}.singleOrNull()
     }

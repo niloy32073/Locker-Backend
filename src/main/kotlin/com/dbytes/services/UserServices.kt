@@ -7,6 +7,9 @@ class UserServices(private val userRepository: UserRepository) {
     suspend fun getUserById(id: Long): User? {
         return userRepository.getUserById(id)
     }
+    suspend fun getUserIdByRole(role: String):Long?{
+        return userRepository.getUserIdByRole(role)
+    }
     suspend fun getUserRoleById(id: Long): String? {
         return userRepository.getUserRoleById(id)
     }

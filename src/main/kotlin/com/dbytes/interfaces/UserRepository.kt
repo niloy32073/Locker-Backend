@@ -6,6 +6,7 @@ import com.dbytes.models.UserPersonalInfo
 
 interface UserRepository {
     suspend fun getUserById(id: Long):User?
+    suspend fun getUserIdByRole(role: String):Long?
     suspend fun getUserRoleById(id:Long):String?
     suspend fun getUserStatusById(id:Long):String?
     suspend fun getUserFirebaseTokenById(id:Long):String?

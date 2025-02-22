@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-client-core:3.1.0")
+    implementation("io.ktor:ktor-client-cio:3.1.0")
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
     implementation(libs.ktor.server.core)
