@@ -15,7 +15,7 @@ suspend fun ApplicationCall.withAdminRole(
     val userId = principal?.payload?.getClaim("userId")?.asString()
     if (userId != null) {
         val userRole = userServices.getUserRoleById(userId.toLong())
-        if (userRole == "admin") {
+        if (userRole == "ADMIN") {
             action()
         } else {
             respond(HttpStatusCode.Unauthorized, "You don't have permission to perform this action")
