@@ -31,6 +31,8 @@ class BuildingRepositoryImpl: BuildingRepository {
     }
 
     override suspend fun deleteBuilding(id: Long) {
-        BuildingTable.deleteWhere { BuildingTable.id eq id }
+        transaction {
+            BuildingTable.deleteWhere { BuildingTable.id eq id }
+        }
     }
 }

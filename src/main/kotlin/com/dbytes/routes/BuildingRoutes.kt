@@ -54,8 +54,9 @@ fun Application.buildingRoutes(buildingServices: BuildingServices,userServices: 
                     try {
                         val buildingId = call.parameters["buildingId"].toString().toLong()
                         buildingServices.deleteBuilding(buildingId)
-                        call.respond(HttpStatusCode.OK)
+                        call.respond(HttpStatusCode.OK,"Building deleted successfully")
                     }catch(ex:Exception) {
+                        println(ex.message)
                         call.respond(HttpStatusCode.InternalServerError, ex.message ?: "Unknown error")
                     }
                 }
