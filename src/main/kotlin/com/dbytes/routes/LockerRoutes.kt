@@ -72,6 +72,12 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                             val reservation = call.receive<Reservation>()
                             lockerServices.reserveLocker(id, reservation)
                             call.respond(HttpStatusCode.OK, "Reserved Request Successful")
+                            lockerServices.updateLockerStatus(
+                                LockerStatusUpdateInfo(
+                                    id = reservation.lockerID,
+                                    status = "RESERVED",
+                                )
+                            )
                             val adminId = userServices.getUserIdByRole(role = "ADMIN")
                             if (adminId != null) {
                                 val adminFcmToken = userServices.getUserFirebaseTokenById(adminId)
@@ -106,6 +112,10 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                 try {
                     val id = call.pathParameters["id"]?.toLong() ?: return@post call.respond(HttpStatusCode.BadRequest)
                     lockerServices.releaseLocker(id)
+                    lockerServices.updateLockerStatus(LockerStatusUpdateInfo(
+                        id = id,
+                        status = "AVAILABLE"
+                    ))
                     call.respond(HttpStatusCode.OK, "Released Successfully")
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
