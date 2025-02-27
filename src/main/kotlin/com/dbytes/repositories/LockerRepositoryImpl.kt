@@ -93,8 +93,10 @@ class LockerRepositoryImpl: LockerRepository {
     }
 
     override suspend fun updateReservationStatus(id: Long, status: String) {
-        ReservationTable.update({ReservationTable.id eq id}){
-            it[ReservationTable.status] = status
+        transaction {
+            ReservationTable.update({ ReservationTable.id eq id }) {
+                it[ReservationTable.status] = status
+            }
         }
     }
 
