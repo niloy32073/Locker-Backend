@@ -15,5 +15,6 @@ interface LockerRepository {
     suspend fun getAllReservations(): List<Reservation>
     suspend fun findReservationsById(id:Long):Reservation?
     suspend fun getAllReservationsByStatus(status:String): List<Reservation>
+    suspend fun getAllReservationsById(id:Long): List<Reservation>
     suspend fun updateReservationStatus(id:Long,status:String)
 }

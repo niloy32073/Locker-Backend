@@ -156,6 +156,24 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                     call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
                 }
             }
+
+            get("/myReservations"){
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.payload?.getClaim("userId")?.asString()
+                try {
+                    val id = userId?.toLong()
+                    if (id != null) {
+                        val reservations = lockerServices.getAllReservationsById(id)
+                        call.respond(HttpStatusCode.OK, reservations)
+                    }
+                    else{
+                        call.respond(HttpStatusCode.Unauthorized, "User not found")
+                    }
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
+                }
+            }
+
             get("/reservations/{id}"){
                 try {
                     val id = call.pathParameters["id"]?.toLong() ?: return@get call.respond(HttpStatusCode.BadRequest)

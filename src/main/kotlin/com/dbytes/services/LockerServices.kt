@@ -47,6 +47,9 @@ class LockerServices(private val lockerRepository: LockerRepository) {
     suspend fun getAllReservationsByStatus(status: String): List<Reservation>{
         return lockerRepository.getAllReservationsByStatus(status)
     }
+    suspend fun getAllReservationsById(id: Long): List<Reservation>{
+        return lockerRepository.getAllReservationsById(id)
+    }
     suspend fun getAllReservations(): List<Reservation>{
         return lockerRepository.getAllReservations()
     }

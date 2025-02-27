@@ -86,6 +86,12 @@ class LockerRepositoryImpl: LockerRepository {
         }
     }
 
+    override suspend fun getAllReservationsById(id: Long): List<Reservation> = transaction {
+        ReservationTable.selectAll().where(ReservationTable.userId eq id).map {
+            Reservation(id = it[ReservationTable.id],userId = it[ReservationTable.userId],status = it[ReservationTable.status], startDate = it[ReservationTable.startDate], endDate = it[ReservationTable.endDate], lockerID = it[ReservationTable.id])
+        }
+    }
+
     override suspend fun updateReservationStatus(id: Long, status: String) {
         ReservationTable.update({ReservationTable.id eq id}){
             it[ReservationTable.status] = status
