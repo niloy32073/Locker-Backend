@@ -1,5 +1,6 @@
  package com.dbytes.routes
 
+import com.dbytes.helpers.withAdminRole
 import com.dbytes.models.*
 import com.dbytes.services.LockerServices
 import com.dbytes.services.UserServices
@@ -115,6 +116,38 @@ fun Application.userRoutes(userServices: UserServices) {
                 }
                 catch (e: Exception){
                     call.respond(HttpStatusCode.Unauthorized, "User not found")
+                }
+            }
+            get("/allUsers") {
+                call.withAdminRole(userServices) {
+                    try {
+                        val users = userServices.getAllUsers()
+                        call.respond(HttpStatusCode.OK, users)
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
+                    }
+                }
+            }
+            post("/updateUserStatus") {
+                call.withAdminRole(userServices) {
+                    try {
+                        val userStatusUpdateInfo = call.receive<UserStatusUpdateInfo>()
+                        userServices.updateUserStatusById(userStatusUpdateInfo.id, userStatusUpdateInfo.status)
+                        call.respond(HttpStatusCode.OK, "User Status successfully updated")
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
+                    }
+                }
+            }
+            delete("/users/{id}") {
+                call.withAdminRole(userServices) {
+                    try {
+                        val id = call.pathParameters["id"]?.toLong() ?: return@withAdminRole call.respond(HttpStatusCode.BadRequest)
+                        userServices.deleteUserById(id)
+                        call.respond(HttpStatusCode.OK, "User Deleted successfully")
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
+                    }
                 }
             }
         }

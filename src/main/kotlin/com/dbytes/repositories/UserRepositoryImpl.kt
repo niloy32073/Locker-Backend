@@ -108,4 +108,19 @@ class UserRepositoryImpl:UserRepository {
         }
     }
 
+    override suspend fun getAllUsers(): List<User> = transaction {
+        UserTable.selectAll().map {
+            User(
+                id = it[UserTable.id],
+                name = it[UserTable.name],
+                email = it[UserTable.email],
+                phone = it[UserTable.phone],
+                roles =  it[UserTable.roles],
+                password =  it[UserTable.password],
+                status =  it[UserTable.status],
+                firebaseToken =  it[UserTable.firebaseToken],
+            )
+        }
+    }
+
 }

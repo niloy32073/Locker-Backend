@@ -40,4 +40,7 @@ class UserServices(private val userRepository: UserRepository) {
     suspend fun getUserFirebaseTokenById(id: Long): String? {
         return userRepository.getUserFirebaseTokenById(id)
     }
+    suspend fun getAllUsers(): List<User> {
+        return userRepository.getAllUsers()
+    }
 }

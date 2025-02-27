@@ -18,4 +18,5 @@ interface UserRepository {
     suspend fun updateUserNameById(id:Long, name:String)
     suspend fun updateUserPhoneById(id:Long, phone:String)
     suspend fun updateUserFirebaseTokenById(id:Long, firebaseToken:String)
+    suspend fun getAllUsers(): List<User>
 }
