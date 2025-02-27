@@ -45,51 +45,66 @@ class UserRepositoryImpl:UserRepository {
     }
 
     override suspend fun deleteUserById(id: Long) {
-        UserTable.deleteWhere { UserTable.id eq id }
-    }
-
-    override suspend fun updateUserStatusById(id: Long, status: String) {
-        UserTable.update({ UserTable.id eq id }) {
-            it[UserTable.status] = status
+        transaction {
+            UserTable.deleteWhere { UserTable.id eq id }
         }
     }
 
+    override suspend fun updateUserStatusById(id: Long, status: String) {
+         transaction {
+             UserTable.update({ UserTable.id eq id }) {
+                 it[UserTable.status] = status
+             }
+         }
+    }
+
     override suspend fun checkUserPasswordById(id: Long, oldPassword: String): Boolean {
-        val idExist = UserTable.select(UserTable.id).where { (UserTable.id eq id)  and (UserTable.password eq oldPassword)}.map {
+        val idExist = transaction {UserTable.select(UserTable.id).where { (UserTable.id eq id)  and (UserTable.password eq oldPassword)}.map {
             it[UserTable.id]
-        }.singleOrNull()
+        }.singleOrNull()}
         return idExist != null
     }
 
     override suspend fun changeUserPasswordById(id: Long, newPassword: String) {
-        UserTable.update({ UserTable.id eq id }) {
-            it[UserTable.password] = newPassword
+        transaction {
+            UserTable.update({ UserTable.id eq id }) {
+                it[UserTable.password] = newPassword
+            }
         }
+
     }
 
     override suspend fun createStudent(id: Long, student: Student) {
-        StudentTable.insert {
-            it[userId] = id
-            it[academicID] = student.academicID
-            it[graduationYear] = student.graduationYear
+        transaction {
+            StudentTable.insert {
+                it[userId] = id
+                it[academicID] = student.academicID
+                it[graduationYear] = student.graduationYear
+            }
         }
     }
 
     override suspend fun updateUserNameById(id: Long, name: String) {
-        UserTable.update({ UserTable.id eq id }) {
-            it[UserTable.name] = name
+        transaction {
+            UserTable.update({ UserTable.id eq id }) {
+                it[UserTable.name] = name
+            }
         }
     }
 
     override suspend fun updateUserPhoneById(id: Long, phone: String) {
-        UserTable.update({ UserTable.id eq id }) {
-            it[UserTable.phone] = phone
+        transaction {
+            UserTable.update({ UserTable.id eq id }) {
+                it[UserTable.phone] = phone
+            }
         }
     }
 
     override suspend fun updateUserFirebaseTokenById(id: Long, firebaseToken: String) {
-        UserTable.update({ UserTable.id eq id }) {
-            it[UserTable.firebaseToken] = firebaseToken
+        transaction {
+            UserTable.update({ UserTable.id eq id }) {
+                it[UserTable.firebaseToken] = firebaseToken
+            }
         }
     }
 

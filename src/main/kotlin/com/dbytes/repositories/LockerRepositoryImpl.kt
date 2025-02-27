@@ -56,7 +56,7 @@ class LockerRepositoryImpl: LockerRepository {
         transaction { ReservationTable.insert {
             it[ReservationTable.userId] = userId
             it[ReservationTable.lockerId] = reservation.lockerID
-            it[ReservationTable.status] = reservation.status
+            it[status] = reservation.status
             it[ReservationTable.endDate] = reservation.endDate
             it[ReservationTable.startDate] = reservation.startDate
         } }
