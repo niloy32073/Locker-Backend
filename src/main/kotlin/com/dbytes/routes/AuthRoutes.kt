@@ -1,6 +1,7 @@
 package com.dbytes.routes
 
 import com.dbytes.models.User
+import com.dbytes.models.UserLogInResult
 import com.dbytes.models.UserSignInInfo
 import com.dbytes.models.UserSignUpInfo
 import com.dbytes.services.AuthServices
@@ -37,7 +38,16 @@ fun Application.authRoutes(authServices: AuthServices) {
                     authServices.loginUser(request)
                 }
                 val token = JWTConfig.generateToken(user.id.toString())
-                call.respond(HttpStatusCode.OK,"token" to token)
+                var id = 0L
+                if(user.id != null)
+                    id = user.id
+                val userLogInResult = UserLogInResult(
+                    userId = id,
+                    roles = user.roles,
+                    status = user.status,
+                    token = token
+                )
+                call.respond(HttpStatusCode.OK,userLogInResult)
             }catch(e:IllegalArgumentException){
                 call.respond(HttpStatusCode.BadRequest,e.message ?: "Invalid request.")
             }

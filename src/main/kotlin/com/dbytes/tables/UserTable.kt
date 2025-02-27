@@ -9,7 +9,7 @@ object UserTable : Table("Users") {
     val phone = varchar("phone", 20)
     val roles = varchar("roles", 255)
     val password = varchar("password", 255)
-    val status = varchar("status", 50).nullable()
+    val status = varchar("status", 50)
     val firebaseToken = varchar("firebaseToken", 255).nullable()
     override val primaryKey = PrimaryKey(id)
 }

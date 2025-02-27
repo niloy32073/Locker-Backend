@@ -67,26 +67,33 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                 try{
                     val id = userId?.toLong()
                     if (id != null) {
-                        val reservation = call.receive<Reservation>()
-                        lockerServices.reserveLocker(id, reservation)
-                        call.respond(HttpStatusCode.OK, "Reserved Request Successful")
-                        val adminId = userServices.getUserIdByRole(role = "ADMIN")
-                        if (adminId != null) {
-                            val adminFcmToken = userServices.getUserFirebaseTokenById(adminId)
-                            if (adminFcmToken != null) {
-                                FcmService.sendNotification(
-                                    targetToken = adminFcmToken,
-                                    title = "New Reservation Request",
-                                    body = "Someone${id} requests for Locker ${reservation.lockerID}"
-                                )
-                                notificationServices.addNotification(Notification(
-                                    id = 0,
-                                    message = "Someone${id} requests for Locker ${reservation.lockerID}",
-                                    timestamp = System.currentTimeMillis(),
-                                    userId = adminId
-                                ))
+                        val status = userServices.getUserStatusById(id)
+                        if (status != "BLOCKED") {
+                            val reservation = call.receive<Reservation>()
+                            lockerServices.reserveLocker(id, reservation)
+                            call.respond(HttpStatusCode.OK, "Reserved Request Successful")
+                            val adminId = userServices.getUserIdByRole(role = "ADMIN")
+                            if (adminId != null) {
+                                val adminFcmToken = userServices.getUserFirebaseTokenById(adminId)
+                                if (adminFcmToken != null) {
+                                    FcmService.sendNotification(
+                                        targetToken = adminFcmToken,
+                                        title = "New Reservation Request",
+                                        body = "Someone${id} requests for Locker ${reservation.lockerID}"
+                                    )
+                                    notificationServices.addNotification(Notification(
+                                        id = 0,
+                                        message = "Someone${id} requests for Locker ${reservation.lockerID}",
+                                        timestamp = System.currentTimeMillis(),
+                                        userId = adminId
+                                    ))
+                                }
                             }
                         }
+                        else{
+                            call.respond(HttpStatusCode.BadRequest, "You are blocked by Admin")
+                        }
+
                     }
                     else{
                         call.respond(HttpStatusCode.Unauthorized, "User not found")

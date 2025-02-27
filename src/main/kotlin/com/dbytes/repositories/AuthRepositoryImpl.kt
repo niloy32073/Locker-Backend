@@ -18,7 +18,7 @@ class AuthRepositoryImpl : AuthRepository {
             it[password] = user.password
             it[phone] = user.phone
             it[roles] = user.roles
-            it[status] = "ACTIVE"
+            it[status] = user.status
         } get UserTable.id
         user.copy(id = userId)
     }
