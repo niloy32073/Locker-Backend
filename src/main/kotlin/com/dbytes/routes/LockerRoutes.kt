@@ -116,6 +116,7 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                         id = id,
                         status = "AVAILABLE"
                     ))
+
                     call.respond(HttpStatusCode.OK, "Released Successfully")
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
@@ -129,6 +130,14 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                         status = reservationStatusInfo.status
                     )
                     val reservation = lockerServices.findReservationsById(reservationStatusInfo.id)
+                    if (reservation != null) {
+                        if(reservation.status == "CLOSED" || reservation.status == "REJECTED") {
+                            lockerServices.updateLockerStatus(LockerStatusUpdateInfo(
+                                id = reservation.lockerID,
+                                status = "AVAILABLE"
+                            ))
+                        }
+                    }
                     val token = reservation?.let { userServices.getUserFirebaseTokenById(it.userId) }
                     if (token != null) {
                         FcmService.sendNotification(
