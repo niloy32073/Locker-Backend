@@ -138,6 +138,7 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                             ))
                         }
                     }
+                    call.respond(HttpStatusCode.OK, "${reservationStatusInfo.status} Successfully")
                     val token = reservation?.let { userServices.getUserFirebaseTokenById(it.userId) }
                     if (token != null) {
                         FcmService.sendNotification(
@@ -169,7 +170,7 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                             ))
                         }
                     }
-                    call.respond(HttpStatusCode.OK, "${reservationStatusInfo.status} Successfully")
+
                 } catch (e: IllegalArgumentException) {
                     call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
                 }

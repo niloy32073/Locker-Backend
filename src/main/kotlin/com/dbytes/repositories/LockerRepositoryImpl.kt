@@ -64,7 +64,7 @@ class LockerRepositoryImpl: LockerRepository {
 
     override suspend fun releaseLocker(id: Long) {
         transaction {
-            ReservationTable.update({ReservationTable.id eq id}){
+            ReservationTable.update({ReservationTable.lockerId eq id}){
                 it[ReservationTable.status] = "RELEASED"
             }
         }
