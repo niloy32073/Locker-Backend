@@ -1,6 +1,5 @@
 package com.dbytes.routes
 
-import com.dbytes.helpers.FcmService
 import com.dbytes.helpers.withAdminRole
 import com.dbytes.models.*
 import com.dbytes.services.LockerServices
@@ -78,23 +77,17 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                                     status = "RESERVED",
                                 )
                             )
-                            val adminId = userServices.getUserIdByRole(role = "ADMIN")
-                            if (adminId != null) {
-                                val adminFcmToken = userServices.getUserFirebaseTokenById(adminId)
-                                if (adminFcmToken != null) {
-                                    FcmService.sendNotification(
-                                        targetToken = adminFcmToken,
-                                        title = "New Reservation Request",
-                                        body = "Someone${id} requests for Locker ${reservation.lockerID}"
-                                    )
-                                    notificationServices.addNotification(Notification(
-                                        id = 0,
-                                        message = "Someone${id} requests for Locker ${reservation.lockerID}",
-                                        timestamp = System.currentTimeMillis(),
-                                        userId = adminId
-                                    ))
-                                }
-                            }
+                            var adminId = 0L
+                            adminId = userServices.getUserIdByRole(role = "ADMIN")!!
+
+                            notificationServices.addNotification(Notification(
+                            id = 0,
+                            message = "Someone${id} requests for Locker ${reservation.lockerID}",
+                            timestamp = System.currentTimeMillis(),
+                            userId = adminId
+                            ))
+
+
                         }
                         else{
                             call.respond(HttpStatusCode.BadRequest, "You are blocked by Admin")
@@ -139,36 +132,23 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                         }
                     }
                     call.respond(HttpStatusCode.OK, "${reservationStatusInfo.status} Successfully")
-                    val token = reservation?.let { userServices.getUserFirebaseTokenById(it.userId) }
-                    if (token != null) {
-                        FcmService.sendNotification(
-                            targetToken = token,
-                            title = "Reservation Request Updated",
-                            body = "The status of the Reservation(${reservationStatusInfo.id}) is ${reservationStatusInfo.status}"
-                        )
+
                         notificationServices.addNotification(Notification(
                             id = 0,
                             message = "The status of the Reservation(${reservationStatusInfo.id}) is ${reservationStatusInfo.status}",
                             timestamp = System.currentTimeMillis(),
-                            userId = reservation.userId
+                            userId = reservation?.userId ?: 0L
                         ))
-                    }
+
                     val adminId = userServices.getUserIdByRole(role = "ADMIN")
                     if (adminId != null) {
-                        val adminFcmToken = userServices.getUserFirebaseTokenById(adminId)
-                        if (adminFcmToken != null) {
-                            FcmService.sendNotification(
-                                targetToken = adminFcmToken,
-                                title = "Reservation Request Updated",
-                                body = "The status of the Reservation(${reservationStatusInfo.id}) is ${reservationStatusInfo.status}"
-                            )
                             notificationServices.addNotification(Notification(
                                 id = 0,
                                 message = "The status of the Reservation(${reservationStatusInfo.id}) is ${reservationStatusInfo.status}",
                                 timestamp = System.currentTimeMillis(),
                                 userId = adminId
                             ))
-                        }
+
                     }
 
                 } catch (e: IllegalArgumentException) {
