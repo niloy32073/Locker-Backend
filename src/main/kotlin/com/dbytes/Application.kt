@@ -1,10 +1,7 @@
 package com.dbytes
 
 import com.dbytes.repositories.*
-import com.dbytes.routes.authRoutes
-import com.dbytes.routes.buildingRoutes
-import com.dbytes.routes.lockerRoutes
-import com.dbytes.routes.userRoutes
+import com.dbytes.routes.*
 import com.dbytes.services.*
 import com.dbytes.uitils.DatabaseConfig
 import com.dbytes.uitils.JWTConfig
@@ -52,4 +49,5 @@ fun Application.module() {
     val buildingRepositoryImpl = BuildingRepositoryImpl()
     val buildingServices = BuildingServices(buildingRepositoryImpl)
     buildingRoutes(buildingServices,userServices)
+    notificationRoutes(notificationServices)
 }
