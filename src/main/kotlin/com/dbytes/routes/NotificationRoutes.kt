@@ -18,7 +18,6 @@ fun Application.notificationRoutes(notificationServices: NotificationServices) {
                     val id = userId?.toLong()
                     if (id != null) {
                         val notifications = notificationServices.getNotifications(id)
-
                         call.respond(HttpStatusCode.OK,notifications)
                     }
                     else{
@@ -26,7 +25,7 @@ fun Application.notificationRoutes(notificationServices: NotificationServices) {
                     }
                 }
                 catch (e: Exception){
-                    call.respond(HttpStatusCode.Unauthorized, "User not found")
+                    call.respond(HttpStatusCode.BadRequest, e.message ?: "Error")
                 }
             }
         }
