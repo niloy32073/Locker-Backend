@@ -76,29 +76,25 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                                     status = "RESERVED",
                                 )
                             )
-                            println("Reserved Successfully")
                             var adminId = 0L
                             adminId = userServices.getUserIdByRole(role = "ADMIN")!!
-                            println("AdminId: $adminId")
                             notificationServices.addNotification(Notification(
                             id = 0,
                             message = "Someone${id} requests for Locker ${reservation.lockerID}",
                             timestamp = System.currentTimeMillis(),
                             userId = adminId
                             ))
-                            println("Notification created")
                             call.respond(HttpStatusCode.OK, "Reserved Request Successful")
                         }
                         else{
                             call.respond(HttpStatusCode.BadRequest, "You are blocked by Admin")
                         }
-
                     }
                     else{
                         call.respond(HttpStatusCode.Unauthorized, "User not found")
                     }
                 }catch (e: Exception){
-                    call.respond(HttpStatusCode.InternalServerError, "Something went wrong")
+                    call.respond(HttpStatusCode.BadRequest, e.message ?: "Unknown error")
                 }
             }
             post("/releaseLocker/{id}") {
