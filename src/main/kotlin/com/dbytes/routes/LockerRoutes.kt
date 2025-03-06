@@ -70,24 +70,24 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                         if (status != "BLOCKED") {
                             val reservation = call.receive<Reservation>()
                             lockerServices.reserveLocker(id, reservation)
-                            call.respond(HttpStatusCode.OK, "Reserved Request Successful")
                             lockerServices.updateLockerStatus(
                                 LockerStatusUpdateInfo(
                                     id = reservation.lockerID,
                                     status = "RESERVED",
                                 )
                             )
+                            println("Reserved Successfully")
                             var adminId = 0L
                             adminId = userServices.getUserIdByRole(role = "ADMIN")!!
-
+                            println("AdminId: $adminId")
                             notificationServices.addNotification(Notification(
                             id = 0,
                             message = "Someone${id} requests for Locker ${reservation.lockerID}",
                             timestamp = System.currentTimeMillis(),
                             userId = adminId
                             ))
-
-
+                            println("Notification created")
+                            call.respond(HttpStatusCode.OK, "Reserved Request Successful")
                         }
                         else{
                             call.respond(HttpStatusCode.BadRequest, "You are blocked by Admin")
