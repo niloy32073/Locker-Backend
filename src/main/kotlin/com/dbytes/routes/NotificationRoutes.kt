@@ -11,7 +11,7 @@ import io.ktor.server.routing.*
 fun Application.notificationRoutes(notificationServices: NotificationServices) {
     routing {
         authenticate("auth-jwt") {
-            get("/user") {
+            get("/notification") {
                 val principal = call.principal<JWTPrincipal>()
                 val userId = principal?.payload?.getClaim("userId")?.asString()
                 try{
