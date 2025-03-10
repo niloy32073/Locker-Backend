@@ -12,6 +12,8 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
@@ -50,4 +52,10 @@ fun Application.module() {
     val buildingServices = BuildingServices(buildingRepositoryImpl)
     buildingRoutes(buildingServices,userServices)
     notificationRoutes(notificationServices)
+    launch {
+        while (true) {
+            delay(60_000) // Check every minute
+            lockerServices.releaseExpiredReservation()
+        }
+    }
 }

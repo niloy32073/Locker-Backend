@@ -56,4 +56,7 @@ class LockerServices(private val lockerRepository: LockerRepository) {
     suspend fun updateReservationStatus(id: Long, status: String) {
         lockerRepository.updateReservationStatus(id, status)
     }
+    suspend fun releaseExpiredReservation(){
+        lockerRepository.releaseExpiredReservation()
+    }
 }

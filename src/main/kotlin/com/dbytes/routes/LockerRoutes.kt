@@ -63,8 +63,10 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
             post("/reserveLocker") {
                 val principal = call.principal<JWTPrincipal>()
                 val userId = principal?.payload?.getClaim("userId")?.asString()
+                println(userId)
                 try{
                     val id = userId?.toLong()
+                    println(id)
                     if (id != null) {
                         val status = userServices.getUserStatusById(id)
                         if (status != "BLOCKED") {
@@ -78,6 +80,7 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                             )
                             var adminId = 0L
                             adminId = userServices.getUserIdByRole(role = "ADMIN")!!
+                            println(adminId)
                             notificationServices.addNotification(Notification(
                             id = 0,
                             message = "Someone${id} requests for Locker ${reservation.lockerID}",

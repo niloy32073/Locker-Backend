@@ -3,15 +3,18 @@ package com.dbytes.repositories
 import com.dbytes.interfaces.LockerRepository
 import com.dbytes.models.Locker
 import com.dbytes.models.LockerStatusUpdateInfo
+import com.dbytes.models.Notification
 import com.dbytes.models.Reservation
 import com.dbytes.tables.LockerTable
+import com.dbytes.tables.NotificationTable
 import com.dbytes.tables.ReservationTable
+import com.dbytes.tables.UserTable
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
+import java.time.LocalDateTime
 
 class LockerRepositoryImpl: LockerRepository {
     override suspend fun createLocker(locker: Locker): Long = transaction {
@@ -99,5 +102,42 @@ class LockerRepositoryImpl: LockerRepository {
             }
         }
     }
+
+    override suspend fun releaseExpiredReservation() {
+        transaction {
+                    val now = System.currentTimeMillis()
+                    val expiredReservations = ReservationTable.selectAll()
+                        .where { ReservationTable.endDate less now and (ReservationTable.status eq "APPROVED") }
+                        .toList()
+                    expiredReservations.forEach { reservation ->
+                        val reservationId = reservation[ReservationTable.id].toLong()
+                        val lockerId = reservation[ReservationTable.lockerId].toLong()
+                        val userId = reservation[ReservationTable.userId].toLong()
+                        val adminId = UserTable.selectAll().where { UserTable.roles eq "ADMIN" }.map {
+                            it[UserTable.id]
+                        }.singleOrNull()
+
+                            ReservationTable.update({ ReservationTable.id eq reservationId }) {
+                                it[ReservationTable.status] = "CLOSED"
+                            }
+                            LockerTable.update({ LockerTable.id eq lockerId } ) {
+                                it[LockerTable.status] = "AVAILABLE"}
+
+                        NotificationTable.insert {
+                            it[message] = "Reservation ${reservationId} for Locker ${reservation[ReservationTable.lockerId].toLong()} has expired and been automatically closed."
+                            it[NotificationTable.userId] = userId
+                            it[timestamp] = System.currentTimeMillis()
+                        }
+                        if (adminId != null) {
+                            NotificationTable.insert {
+                                it[message] =
+                                    "Reservation ${reservationId} for Locker ${reservation[ReservationTable.lockerId].toLong()} has expired and been automatically closed."
+                                it[NotificationTable.userId] = adminId
+                                it[timestamp] = System.currentTimeMillis()
+                            }
+                        }
+                    }
+                }
+            }
 
 }
