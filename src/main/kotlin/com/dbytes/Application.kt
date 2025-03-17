@@ -55,6 +55,7 @@ fun Application.module() {
     launch {
         while (true) {
             delay(60_000) // Check every minute
+            println("Check")
             lockerServices.releaseExpiredReservation()
         }
     }

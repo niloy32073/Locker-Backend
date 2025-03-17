@@ -69,13 +69,16 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                     println(id)
                     if (id != null) {
                         val status = userServices.getUserStatusById(id)
-                        if (status != "BLOCKED") {
+                        val reservations = lockerServices.getAllReservationsById(id)
+                        val targetStatuses = setOf("RELEASED", "REJECTED")
+                        val hasOneReservation = reservations.any { reservation -> reservation.status !in targetStatuses }
+                        if (status != "BLOCKED" && !hasOneReservation) {
                             val reservation = call.receive<Reservation>()
                             lockerServices.reserveLocker(id, reservation)
                             lockerServices.updateLockerStatus(
                                 LockerStatusUpdateInfo(
                                     id = reservation.lockerID,
-                                    status = "RESERVED",
+                                    status = "Reserved",
                                 )
                             )
                             var adminId = 0L
@@ -88,6 +91,9 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                             userId = adminId
                             ))
                             call.respond(HttpStatusCode.OK, "Reserved Request Successful")
+                        }
+                        else if (status != "BLOCKED" && hasOneReservation){
+                            call.respond(HttpStatusCode.BadRequest, "You have already made a request or have an Active Reservation")
                         }
                         else{
                             call.respond(HttpStatusCode.BadRequest, "You are blocked by Admin")
@@ -106,7 +112,7 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                     lockerServices.releaseLocker(id)
                     lockerServices.updateLockerStatus(LockerStatusUpdateInfo(
                         id = id,
-                        status = "AVAILABLE"
+                        status = "Available"
                     ))
 
                     call.respond(HttpStatusCode.OK, "Released Successfully")
@@ -123,10 +129,10 @@ fun Application.lockerRoutes(lockerServices: LockerServices,userServices: UserSe
                     )
                     val reservation = lockerServices.findReservationsById(reservationStatusInfo.id)
                     if (reservation != null) {
-                        if(reservation.status == "CLOSED" || reservation.status == "REJECTED") {
+                        if(reservation.status == "RELEASED" || reservation.status == "REJECTED") {
                             lockerServices.updateLockerStatus(LockerStatusUpdateInfo(
                                 id = reservation.lockerID,
-                                status = "AVAILABLE"
+                                status = "Available"
                             ))
                         }
                     }

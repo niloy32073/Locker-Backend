@@ -109,6 +109,7 @@ class LockerRepositoryImpl: LockerRepository {
                     val expiredReservations = ReservationTable.selectAll()
                         .where { ReservationTable.endDate less now and (ReservationTable.status eq "APPROVED") }
                         .toList()
+            println("trying")
                     expiredReservations.forEach { reservation ->
                         val reservationId = reservation[ReservationTable.id].toLong()
                         val lockerId = reservation[ReservationTable.lockerId].toLong()
@@ -138,6 +139,7 @@ class LockerRepositoryImpl: LockerRepository {
                         }
                     }
                 }
+        println("Finished")
             }
 
 }
