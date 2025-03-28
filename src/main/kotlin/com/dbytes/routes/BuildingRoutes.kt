@@ -35,6 +35,18 @@ fun Application.buildingRoutes(buildingServices: BuildingServices,userServices: 
                     }
                 }
             }
+            post("/updateBuilding"){
+                call.withAdminRole(userServices){
+                    try {
+                        val building = call.receive<Building>()
+                        buildingServices.updateBuilding(building = building)
+                        call.respond(HttpStatusCode.Created,"Update successful")
+                    }
+                    catch(ex:Exception) {
+                        call.respond(HttpStatusCode.InternalServerError, ex.message ?: "Unknown error")
+                    }
+                }
+            }
             get("/buildings/{buildingId}"){
                 try {
                     val buildingId = call.parameters["buildingId"].toString().toLong()

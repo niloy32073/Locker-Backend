@@ -19,4 +19,8 @@ class BuildingServices( private val buildingRepository: BuildingRepository) {
         val buildings = buildingRepository.getAllBuilding()
         return buildings
     }
+
+    suspend fun updateBuilding(building: Building) {
+        buildingRepository.updateBuilding(building = building)
+    }
 }

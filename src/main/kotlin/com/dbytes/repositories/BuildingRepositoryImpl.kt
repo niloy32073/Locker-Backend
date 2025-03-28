@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 class BuildingRepositoryImpl: BuildingRepository {
     override suspend fun createBuilding(building: Building): Long = transaction {
@@ -33,6 +34,16 @@ class BuildingRepositoryImpl: BuildingRepository {
     override suspend fun deleteBuilding(id: Long) {
         transaction {
             BuildingTable.deleteWhere { BuildingTable.id eq id }
+        }
+    }
+
+    override suspend fun updateBuilding(building: Building) {
+        transaction {
+            BuildingTable.update({ BuildingTable.id eq building.id }) {
+                it[location] = building.location
+                it[name] = building.name
+                it[totalLocker] = building.totalLocker
+            }
         }
     }
 }
